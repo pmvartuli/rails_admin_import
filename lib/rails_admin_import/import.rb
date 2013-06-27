@@ -62,9 +62,7 @@ module RailsAdminImport
             return results = { :success => [], :error => ["You must select a file."] }
           end
 
-          if RailsAdminImport.config.logging
-            FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
-          end
+          copy_import_file_to_logs(params[:file].tempfile, logger) if RailsAdminImport.config.logging
 
           text       = File.read(params[:file].tempfile)
           clean      = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
@@ -132,6 +130,16 @@ module RailsAdminImport
           logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
           return results = { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
         end
+      end
+      
+      def copy_import_file_to_logs(import_file, logger)
+        import_file_path = "#{Rails.root}/log/import/"
+        import_file_name = "#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv"
+        
+        FileUtils.mkdir_p import_file_path
+        FileUtils.copy(import_file, tempfile,import_file_path+import_file_name)
+        rescue
+          logger.info "#{Time.now.to_s}: can't copy import file to logs: #{e.inspect}"
       end
   
       def import_initialize(row, map, update)
