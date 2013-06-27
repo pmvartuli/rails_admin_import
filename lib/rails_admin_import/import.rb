@@ -138,7 +138,7 @@ module RailsAdminImport
         
         FileUtils.mkdir_p import_file_path
         FileUtils.copy(import_file, tempfile,import_file_path+import_file_name)
-        rescue
+        rescue Exception => e
           logger.info "#{Time.now.to_s}: can't copy import file to logs: #{e.inspect}"
       end
   
