@@ -115,6 +115,7 @@ module RailsAdminImport
               if object.save
                 logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}"
                 results[:success] << "#{verb}d: #{object.send(label_method)}"
+                object.after_import_save(row, map)
               else
                 logger.info "#{Time.now.to_s}: Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
                 results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
@@ -165,6 +166,10 @@ module RailsAdminImport
     end
    
     def before_import_save(*args)
+      # Meant to be overridden to do special actions
+    end
+
+    def after_import_save(*args)
       # Meant to be overridden to do special actions
     end
 
